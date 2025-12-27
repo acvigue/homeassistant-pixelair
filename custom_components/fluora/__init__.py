@@ -82,11 +82,11 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     # Create coordinator
     coordinator = FluoraDeviceCoordinator(hass, device, entry)
 
-    # Set up state callback for push updates
-    coordinator.setup_state_callback()
-
     # Do initial refresh
     await coordinator.async_config_entry_first_refresh()
+
+    # Start state_counter polling (efficient: only fetches full state when changes)
+    await coordinator.async_start_polling()
 
     # Store entry-specific data
     hass.data[DOMAIN][entry.entry_id] = {
@@ -111,7 +111,7 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         if entry_data:
             coordinator: FluoraDeviceCoordinator = entry_data.get("coordinator")
             if coordinator:
-                coordinator.remove_state_callback()
+                await coordinator.async_stop_polling()
             device: PixelAirDevice = entry_data.get("device")
             if device:
                 await device.unregister()

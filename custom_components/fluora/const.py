@@ -6,9 +6,6 @@ DOMAIN = "fluora"
 CONF_MAC_ADDRESS = "mac_address"
 CONF_SERIAL_NUMBER = "serial_number"
 
-# Coordinator update interval in seconds
-UPDATE_INTERVAL = 30
-
 # Discovery timeout in seconds
 DISCOVERY_TIMEOUT = 10
 

@@ -10,7 +10,7 @@
     "integration_type": "device",
     "iot_class": "local_poll",
     "requirements": [
-        "libpixelair==0.2.1"
+        "libpixelair==0.2.2"
     ],
-    "version": "0.2.2"
+    "version": "0.2.3"
 }

@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-from datetime import timedelta
 import logging
 
 from libpixelair import PixelAirDevice, DeviceState, DeviceMode
@@ -17,15 +16,23 @@ from .const import (
     DOMAIN,
     CONF_MAC_ADDRESS,
     CONF_SERIAL_NUMBER,
-    UPDATE_INTERVAL,
     CONNECTION_TIMEOUT,
 )
 
 _LOGGER = logging.getLogger(__name__)
 
+# Polling interval for state_counter checks (seconds)
+POLL_INTERVAL = 2.5
+
 
 class FluoraDeviceCoordinator(DataUpdateCoordinator[DeviceState]):
-    """Coordinator to manage device state updates."""
+    """Coordinator to manage device state updates.
+
+    Uses the library's efficient state_counter-based polling:
+    - Polls device every 2.5 seconds with lightweight discovery request
+    - Only fetches full state when state_counter changes
+    - State changes trigger callbacks that update the coordinator
+    """
 
     def __init__(
         self,
@@ -40,23 +47,47 @@ class FluoraDeviceCoordinator(DataUpdateCoordinator[DeviceState]):
         self.serial_number = entry.data.get(CONF_SERIAL_NUMBER, "")
         self.name = entry.data.get(CONF_NAME, "Fluora Device")
         self._state_callback_registered = False
+        self._polling_started = False
 
+        # No update_interval - we use the library's polling instead
         super().__init__(
             hass,
             _LOGGER,
             name=f"{DOMAIN}_{self.serial_number}",
-            update_interval=timedelta(seconds=UPDATE_INTERVAL),
+            update_interval=None,
         )
 
-    def setup_state_callback(self) -> None:
-        """Set up the state change callback from the device."""
+    async def async_start_polling(self) -> None:
+        """Start the device polling and state callbacks."""
+        if self._polling_started:
+            return
+
+        # Register state callback for updates
         if not self._state_callback_registered:
             self.device.add_state_callback(self._on_device_state_change)
             self._state_callback_registered = True
             _LOGGER.debug("Registered state callback for %s", self.name)
 
-    def remove_state_callback(self) -> None:
-        """Remove the state change callback."""
+        # Start the library's efficient state_counter polling
+        try:
+            await self.device.start_polling(interval=POLL_INTERVAL)
+            self._polling_started = True
+            _LOGGER.debug("Started polling for %s", self.name)
+        except Exception as err:
+            _LOGGER.error("Failed to start polling for %s: %s", self.name, err)
+
+    async def async_stop_polling(self) -> None:
+        """Stop the device polling and remove state callbacks."""
+        # Stop polling
+        if self._polling_started:
+            try:
+                await self.device.stop_polling()
+                self._polling_started = False
+                _LOGGER.debug("Stopped polling for %s", self.name)
+            except Exception as err:
+                _LOGGER.warning("Error stopping polling for %s: %s", self.name, err)
+
+        # Remove state callback
         if self._state_callback_registered:
             self.device.remove_state_callback(self._on_device_state_change)
             self._state_callback_registered = False
@@ -67,8 +98,8 @@ class FluoraDeviceCoordinator(DataUpdateCoordinator[DeviceState]):
     ) -> None:
         """Handle state change from device (called from library).
 
-        This callback is invoked from the library's async context,
-        so we can directly update the coordinator data.
+        This callback is invoked from the library's async context
+        when the device state is updated (after state_counter changes).
         """
         self.async_set_updated_data(new_state)
 
@@ -82,7 +113,11 @@ class FluoraDeviceCoordinator(DataUpdateCoordinator[DeviceState]):
         self.async_set_updated_data(self.device.state)
 
     async def _async_update_data(self) -> DeviceState:
-        """Fetch data from the device."""
+        """Fetch data from the device.
+
+        This is called for the initial refresh. Subsequent updates
+        come via the polling mechanism and state callbacks.
+        """
         try:
             # Try to resolve IP if needed (handles DHCP changes)
             try:
