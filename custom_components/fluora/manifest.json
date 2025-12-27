@@ -1,0 +1,16 @@
+{
+    "domain": "fluora",
+    "name": "Fluora",
+    "codeowners": [
+        "@acvigue"
+    ],
+    "config_flow": true,
+    "dependencies": [],
+    "documentation": "https://github.com/acvigue/homeassistant-fluora",
+    "integration_type": "device",
+    "iot_class": "local_poll",
+    "requirements": [
+        "libpixelair==0.2.1"
+    ],
+    "version": "0.2.1"
+}
