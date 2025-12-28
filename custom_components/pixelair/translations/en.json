@@ -1,0 +1,31 @@
+{
+    "config": {
+        "step": {
+            "user": {
+                "title": "PixelAir",
+                "description": "Press submit to search for PixelAir devices on your network."
+            },
+            "select_device": {
+                "title": "Select device",
+                "description": "Multiple PixelAir devices were found. Select the device you want to add.",
+                "data": {
+                    "device": "Device"
+                }
+            },
+            "confirm": {
+                "title": "Confirm device",
+                "description": "Do you want to add **{name}**?\n\n- Model: {model}\n- Serial number: {serial}\n- IP address: {ip}"
+            }
+        },
+        "error": {
+            "cannot_connect": "Unable to connect to the device. Please ensure it is powered on and connected to the network.",
+            "unknown": "An unexpected error occurred."
+        },
+        "abort": {
+            "already_configured": "This device is already configured.",
+            "no_devices_found": "No PixelAir devices were found on the network. Please ensure your device is powered on and connected to the same network.",
+            "all_devices_configured": "All discovered PixelAir devices are already configured.",
+            "device_not_found": "The selected device could not be found."
+        }
+    }
+}

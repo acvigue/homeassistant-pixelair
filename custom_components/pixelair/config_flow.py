@@ -1,39 +1,52 @@
-"""Config flow for Fluora integration."""
+"""Config flow for the PixelAir integration.
+
+This module handles the configuration flow for adding PixelAir devices
+to Home Assistant. It supports automatic device discovery on the
+local network via UDP broadcast.
+"""
 
 from __future__ import annotations
 
 import logging
 from typing import Any
 
-from libpixelair import UDPListener, DiscoveryService, DiscoveredDevice
+from libpixelair import DiscoveredDevice, DiscoveryService, UDPListener
 import voluptuous as vol
 
-from homeassistant import config_entries
-from homeassistant.config_entries import ConfigFlowResult
+from homeassistant.config_entries import ConfigFlow, ConfigFlowResult
 from homeassistant.const import CONF_NAME
 
 from .const import (
-    DOMAIN,
     CONF_MAC_ADDRESS,
     CONF_SERIAL_NUMBER,
     DISCOVERY_TIMEOUT,
+    DOMAIN,
 )
 
 _LOGGER = logging.getLogger(__name__)
 
 
-class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
-    """Handle a config flow for Fluora."""
+class PixelAirConfigFlow(ConfigFlow, domain=DOMAIN):
+    """Handle a config flow for PixelAir.
+
+    This config flow discovers PixelAir devices on the local network
+    and allows the user to select and add them to Home Assistant.
+    """
 
     VERSION = 1
 
     def __init__(self) -> None:
         """Initialize the config flow."""
         self._discovered_device: DiscoveredDevice | None = None
+        self._discovered_devices: dict[str, DiscoveredDevice] = {}
         self._listener: UDPListener | None = None
 
     async def _get_listener(self) -> UDPListener:
-        """Get or create a UDP listener for discovery."""
+        """Get or create a UDP listener for discovery.
+
+        Returns:
+            The UDP listener instance.
+        """
         if self._listener is None:
             self._listener = UDPListener()
             await self._listener.start()
@@ -48,23 +61,39 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     async def async_step_user(
         self, user_input: dict[str, Any] | None = None
     ) -> ConfigFlowResult:
-        """Handle user-initiated discovery."""
-        errors: dict[str, str] = {}
+        """Handle user-initiated setup.
 
+        This is the first step when a user adds the integration.
+        It prompts the user to start device discovery.
+
+        Args:
+            user_input: User input from the form (if submitted).
+
+        Returns:
+            The next step in the flow.
+        """
         if user_input is not None:
-            # User clicked submit - start discovery
             return await self.async_step_discovery()
 
         return self.async_show_form(
             step_id="user",
             data_schema=vol.Schema({}),
-            errors=errors,
         )
 
     async def async_step_discovery(
-        self, user_input: dict[str, Any] | None = None
+        self, _user_input: dict[str, Any] | None = None
     ) -> ConfigFlowResult:
-        """Handle device discovery."""
+        """Handle device discovery.
+
+        Discovers PixelAir devices on the network and determines
+        the next step based on how many devices are found.
+
+        Args:
+            _user_input: Not used in this step.
+
+        Returns:
+            The next step in the flow.
+        """
         errors: dict[str, str] = {}
 
         try:
@@ -85,13 +114,14 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             new_devices: list[DiscoveredDevice] = []
             for device in devices:
                 if device.mac_address:
-                    existing_entry = await self.async_set_unique_id(
-                        device.mac_address.lower()
+                    await self.async_set_unique_id(device.mac_address.lower())
+                    existing = self._async_current_entries()
+                    is_configured = any(
+                        entry.unique_id == device.mac_address.lower()
+                        for entry in existing
                     )
-                    if existing_entry is None:
+                    if not is_configured:
                         new_devices.append(device)
-                    # Reset unique_id for next iteration
-                    self._async_abort_entries_match({})
 
             if not new_devices:
                 return self.async_abort(reason="all_devices_configured")
@@ -103,13 +133,16 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                     self._discovered_device.mac_address.lower()
                 )
                 self._abort_if_unique_id_configured()
-                return await self.async_step_confirm_discovery()
+                return await self.async_step_confirm()
 
-            # Multiple devices - let user select
-            return await self.async_step_select_device(new_devices)
+            # Multiple devices - store them and let user select
+            self._discovered_devices = {
+                device.serial_number: device for device in new_devices
+            }
+            return await self.async_step_select_device()
 
         except Exception as err:
-            _LOGGER.error("Error during discovery: %s", err)
+            _LOGGER.exception("Error during discovery: %s", err)
             await self._cleanup_listener()
             errors["base"] = "cannot_connect"
             return self.async_show_form(
@@ -119,20 +152,35 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             )
 
     async def async_step_select_device(
-        self, devices: list[DiscoveredDevice] | None = None
+        self, user_input: dict[str, Any] | None = None
     ) -> ConfigFlowResult:
-        """Handle device selection when multiple devices found."""
-        if devices is None:
-            return self.async_abort(reason="no_devices_found")
+        """Handle device selection when multiple devices are found.
 
-        # Store devices for selection
-        self.context["devices"] = {
-            device.serial_number: device for device in devices
-        }
+        Args:
+            user_input: User's device selection (if submitted).
+
+        Returns:
+            The next step in the flow.
+        """
+        if user_input is not None:
+            serial = user_input.get("device")
+            self._discovered_device = self._discovered_devices.get(serial)
+
+            if self._discovered_device is None:
+                return self.async_abort(reason="device_not_found")
+
+            await self.async_set_unique_id(
+                self._discovered_device.mac_address.lower()
+            )
+            self._abort_if_unique_id_configured()
+            return await self.async_step_confirm()
+
+        if not self._discovered_devices:
+            return self.async_abort(reason="no_devices_found")
 
         device_options = {
             device.serial_number: f"{device.display_name} ({device.ip_address})"
-            for device in devices
+            for device in self._discovered_devices.values()
         }
 
         return self.async_show_form(
@@ -144,34 +192,21 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             ),
         )
 
-    async def async_step_select_device_submit(
+    async def async_step_confirm(
         self, user_input: dict[str, Any] | None = None
     ) -> ConfigFlowResult:
-        """Handle device selection submission."""
-        if user_input is None:
-            return self.async_abort(reason="no_device_selected")
+        """Confirm adding the discovered device.
 
-        serial = user_input.get("device")
-        devices = self.context.get("devices", {})
-        self._discovered_device = devices.get(serial)
+        Args:
+            user_input: User confirmation (if submitted).
 
-        if self._discovered_device is None:
-            return self.async_abort(reason="device_not_found")
-
-        await self.async_set_unique_id(self._discovered_device.mac_address.lower())
-        self._abort_if_unique_id_configured()
-
-        return await self.async_step_confirm_discovery()
-
-    async def async_step_confirm_discovery(
-        self, user_input: dict[str, Any] | None = None
-    ) -> ConfigFlowResult:
-        """Confirm adding the discovered device."""
+        Returns:
+            The config entry creation or confirmation form.
+        """
         if self._discovered_device is None:
             return self.async_abort(reason="device_not_found")
 
         if user_input is not None:
-            # User confirmed - create the entry
             return self.async_create_entry(
                 title=self._discovered_device.display_name,
                 data={
@@ -181,12 +216,11 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 },
             )
 
-        # Show confirmation form
         return self.async_show_form(
-            step_id="confirm_discovery",
+            step_id="confirm",
             description_placeholders={
                 "name": self._discovered_device.display_name,
-                "model": self._discovered_device.model or "Unknown",
+                "model": self._discovered_device.model or "PixelAir",
                 "serial": self._discovered_device.serial_number,
                 "ip": self._discovered_device.ip_address,
             },
