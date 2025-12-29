@@ -1,13 +1,876 @@
 {
     "domain": "pixelair",
     "name": "PixelAir",
-    "codeowners": ["@acvigue"],
+    "codeowners": [
+        "@acvigue"
+    ],
     "config_flow": true,
-    "dependencies": [],
+    "dependencies": [
+        "dhcp"
+    ],
+    "dhcp": [
+        {
+            "macaddress": "004B12*"
+        },
+        {
+            "macaddress": "007007*"
+        },
+        {
+            "macaddress": "048308*"
+        },
+        {
+            "macaddress": "04B247*"
+        },
+        {
+            "macaddress": "083A8D*"
+        },
+        {
+            "macaddress": "083AF2*"
+        },
+        {
+            "macaddress": "089272*"
+        },
+        {
+            "macaddress": "08A6F7*"
+        },
+        {
+            "macaddress": "08B61F*"
+        },
+        {
+            "macaddress": "08D1F9*"
+        },
+        {
+            "macaddress": "08F9E0*"
+        },
+        {
+            "macaddress": "0C4EA0*"
+        },
+        {
+            "macaddress": "0C8B95*"
+        },
+        {
+            "macaddress": "0CB815*"
+        },
+        {
+            "macaddress": "0CDC7E*"
+        },
+        {
+            "macaddress": "10003B*"
+        },
+        {
+            "macaddress": "10061C*"
+        },
+        {
+            "macaddress": "1020BA*"
+        },
+        {
+            "macaddress": "1051DB*"
+        },
+        {
+            "macaddress": "10521C*"
+        },
+        {
+            "macaddress": "1091A8*"
+        },
+        {
+            "macaddress": "1097BD*"
+        },
+        {
+            "macaddress": "10B41D*"
+        },
+        {
+            "macaddress": "140808*"
+        },
+        {
+            "macaddress": "142B2F*"
+        },
+        {
+            "macaddress": "14335C*"
+        },
+        {
+            "macaddress": "14C19F*"
+        },
+        {
+            "macaddress": "188B0E*"
+        },
+        {
+            "macaddress": "18FE34*"
+        },
+        {
+            "macaddress": "1C6920*"
+        },
+        {
+            "macaddress": "1C9DC2*"
+        },
+        {
+            "macaddress": "1CC3AB*"
+        },
+        {
+            "macaddress": "1CDBD4*"
+        },
+        {
+            "macaddress": "2043A8*"
+        },
+        {
+            "macaddress": "206EF1*"
+        },
+        {
+            "macaddress": "20E7C8*"
+        },
+        {
+            "macaddress": "240AC4*"
+        },
+        {
+            "macaddress": "244CAB*"
+        },
+        {
+            "macaddress": "24587C*"
+        },
+        {
+            "macaddress": "2462AB*"
+        },
+        {
+            "macaddress": "246F28*"
+        },
+        {
+            "macaddress": "24A160*"
+        },
+        {
+            "macaddress": "24B2DE*"
+        },
+        {
+            "macaddress": "24D7EB*"
+        },
+        {
+            "macaddress": "24DCC3*"
+        },
+        {
+            "macaddress": "24EC4A*"
+        },
+        {
+            "macaddress": "2805A5*"
+        },
+        {
+            "macaddress": "28372F*"
+        },
+        {
+            "macaddress": "28562F*"
+        },
+        {
+            "macaddress": "2C3AE8*"
+        },
+        {
+            "macaddress": "2CBCBB*"
+        },
+        {
+            "macaddress": "2CF432*"
+        },
+        {
+            "macaddress": "3030F9*"
+        },
+        {
+            "macaddress": "3076F5*"
+        },
+        {
+            "macaddress": "308398*"
+        },
+        {
+            "macaddress": "30AEA4*"
+        },
+        {
+            "macaddress": "30C6F7*"
+        },
+        {
+            "macaddress": "30C922*"
+        },
+        {
+            "macaddress": "30EDA0*"
+        },
+        {
+            "macaddress": "345F45*"
+        },
+        {
+            "macaddress": "348518*"
+        },
+        {
+            "macaddress": "34865D*"
+        },
+        {
+            "macaddress": "349454*"
+        },
+        {
+            "macaddress": "34987A*"
+        },
+        {
+            "macaddress": "34AB95*"
+        },
+        {
+            "macaddress": "34B472*"
+        },
+        {
+            "macaddress": "34B7DA*"
+        },
+        {
+            "macaddress": "34CDB0*"
+        },
+        {
+            "macaddress": "38182B*"
+        },
+        {
+            "macaddress": "3844BE*"
+        },
+        {
+            "macaddress": "3C0F02*"
+        },
+        {
+            "macaddress": "3C6105*"
+        },
+        {
+            "macaddress": "3C71BF*"
+        },
+        {
+            "macaddress": "3C8427*"
+        },
+        {
+            "macaddress": "3C8A1F*"
+        },
+        {
+            "macaddress": "3CDC75*"
+        },
+        {
+            "macaddress": "3CE90E*"
+        },
+        {
+            "macaddress": "4022D8*"
+        },
+        {
+            "macaddress": "404CCA*"
+        },
+        {
+            "macaddress": "409151*"
+        },
+        {
+            "macaddress": "40F520*"
+        },
+        {
+            "macaddress": "441793*"
+        },
+        {
+            "macaddress": "441BF6*"
+        },
+        {
+            "macaddress": "441D64*"
+        },
+        {
+            "macaddress": "4827E2*"
+        },
+        {
+            "macaddress": "4831B7*"
+        },
+        {
+            "macaddress": "483FDA*"
+        },
+        {
+            "macaddress": "485519*"
+        },
+        {
+            "macaddress": "489D31*"
+        },
+        {
+            "macaddress": "48CA43*"
+        },
+        {
+            "macaddress": "48E729*"
+        },
+        {
+            "macaddress": "48F6EE*"
+        },
+        {
+            "macaddress": "4C11AE*"
+        },
+        {
+            "macaddress": "4C7525*"
+        },
+        {
+            "macaddress": "4CC382*"
+        },
+        {
+            "macaddress": "4CEBD6*"
+        },
+        {
+            "macaddress": "500291*"
+        },
+        {
+            "macaddress": "50787D*"
+        },
+        {
+            "macaddress": "543204*"
+        },
+        {
+            "macaddress": "5443B2*"
+        },
+        {
+            "macaddress": "545AA6*"
+        },
+        {
+            "macaddress": "588C81*"
+        },
+        {
+            "macaddress": "58BF25*"
+        },
+        {
+            "macaddress": "58CF79*"
+        },
+        {
+            "macaddress": "58E6C5*"
+        },
+        {
+            "macaddress": "5C013B*"
+        },
+        {
+            "macaddress": "5CCF7F*"
+        },
+        {
+            "macaddress": "600194*"
+        },
+        {
+            "macaddress": "6055F9*"
+        },
+        {
+            "macaddress": "64B708*"
+        },
+        {
+            "macaddress": "64E833*"
+        },
+        {
+            "macaddress": "6825DD*"
+        },
+        {
+            "macaddress": "686725*"
+        },
+        {
+            "macaddress": "68B6B3*"
+        },
+        {
+            "macaddress": "68C63A*"
+        },
+        {
+            "macaddress": "68FE71*"
+        },
+        {
+            "macaddress": "6CB456*"
+        },
+        {
+            "macaddress": "6CC840*"
+        },
+        {
+            "macaddress": "70039F*"
+        },
+        {
+            "macaddress": "70041D*"
+        },
+        {
+            "macaddress": "704BCA*"
+        },
+        {
+            "macaddress": "70B8F6*"
+        },
+        {
+            "macaddress": "744DBD*"
+        },
+        {
+            "macaddress": "781C3C*"
+        },
+        {
+            "macaddress": "782184*"
+        },
+        {
+            "macaddress": "78421C*"
+        },
+        {
+            "macaddress": "78E36D*"
+        },
+        {
+            "macaddress": "78EE4C*"
+        },
+        {
+            "macaddress": "7C2C67*"
+        },
+        {
+            "macaddress": "7C7398*"
+        },
+        {
+            "macaddress": "7C87CE*"
+        },
+        {
+            "macaddress": "7C9EBD*"
+        },
+        {
+            "macaddress": "7CDFA1*"
+        },
+        {
+            "macaddress": "80646F*"
+        },
+        {
+            "macaddress": "806599*"
+        },
+        {
+            "macaddress": "807D3A*"
+        },
+        {
+            "macaddress": "80B54E*"
+        },
+        {
+            "macaddress": "80F1B2*"
+        },
+        {
+            "macaddress": "80F3DA*"
+        },
+        {
+            "macaddress": "840D8E*"
+        },
+        {
+            "macaddress": "841FE8*"
+        },
+        {
+            "macaddress": "84CCA8*"
+        },
+        {
+            "macaddress": "84F3EB*"
+        },
+        {
+            "macaddress": "84F703*"
+        },
+        {
+            "macaddress": "84FCE6*"
+        },
+        {
+            "macaddress": "8813BF*"
+        },
+        {
+            "macaddress": "8856A6*"
+        },
+        {
+            "macaddress": "885721*"
+        },
+        {
+            "macaddress": "8C4B14*"
+        },
+        {
+            "macaddress": "8C4F00*"
+        },
+        {
+            "macaddress": "8CAAB5*"
+        },
+        {
+            "macaddress": "8CBFEA*"
+        },
+        {
+            "macaddress": "8CCE4E*"
+        },
+        {
+            "macaddress": "8CFD49*"
+        },
+        {
+            "macaddress": "901506*"
+        },
+        {
+            "macaddress": "90380C*"
+        },
+        {
+            "macaddress": "907069*"
+        },
+        {
+            "macaddress": "9097D5*"
+        },
+        {
+            "macaddress": "90E5B1*"
+        },
+        {
+            "macaddress": "943CC6*"
+        },
+        {
+            "macaddress": "9451DC*"
+        },
+        {
+            "macaddress": "9454C5*"
+        },
+        {
+            "macaddress": "94A990*"
+        },
+        {
+            "macaddress": "94B555*"
+        },
+        {
+            "macaddress": "94B97E*"
+        },
+        {
+            "macaddress": "94E686*"
+        },
+        {
+            "macaddress": "983DAE*"
+        },
+        {
+            "macaddress": "9888E0*"
+        },
+        {
+            "macaddress": "98A316*"
+        },
+        {
+            "macaddress": "98CDAC*"
+        },
+        {
+            "macaddress": "98F4AB*"
+        },
+        {
+            "macaddress": "9C139E*"
+        },
+        {
+            "macaddress": "9C9C1F*"
+        },
+        {
+            "macaddress": "9C9E6E*"
+        },
+        {
+            "macaddress": "A020A6*"
+        },
+        {
+            "macaddress": "A0764E*"
+        },
+        {
+            "macaddress": "A085E3*"
+        },
+        {
+            "macaddress": "A0A3B3*"
+        },
+        {
+            "macaddress": "A0B765*"
+        },
+        {
+            "macaddress": "A0DD6C*"
+        },
+        {
+            "macaddress": "A0F262*"
+        },
+        {
+            "macaddress": "A47B9D*"
+        },
+        {
+            "macaddress": "A4CF12*"
+        },
+        {
+            "macaddress": "A4E57C*"
+        },
+        {
+            "macaddress": "A4F00F*"
+        },
+        {
+            "macaddress": "A8032A*"
+        },
+        {
+            "macaddress": "A842E3*"
+        },
+        {
+            "macaddress": "A84674*"
+        },
+        {
+            "macaddress": "A848FA*"
+        },
+        {
+            "macaddress": "AC0BFB*"
+        },
+        {
+            "macaddress": "AC1518*"
+        },
+        {
+            "macaddress": "AC67B2*"
+        },
+        {
+            "macaddress": "ACA704*"
+        },
+        {
+            "macaddress": "ACD074*"
+        },
+        {
+            "macaddress": "ACEBE6*"
+        },
+        {
+            "macaddress": "B08184*"
+        },
+        {
+            "macaddress": "B0A604*"
+        },
+        {
+            "macaddress": "B0A732*"
+        },
+        {
+            "macaddress": "B0B21C*"
+        },
+        {
+            "macaddress": "B0CBD8*"
+        },
+        {
+            "macaddress": "B43A45*"
+        },
+        {
+            "macaddress": "B48A0A*"
+        },
+        {
+            "macaddress": "B4BFE9*"
+        },
+        {
+            "macaddress": "B4E62D*"
+        },
+        {
+            "macaddress": "B8D61A*"
+        },
+        {
+            "macaddress": "B8F009*"
+        },
+        {
+            "macaddress": "B8F862*"
+        },
+        {
+            "macaddress": "BCDDC2*"
+        },
+        {
+            "macaddress": "BCFF4D*"
+        },
+        {
+            "macaddress": "C049EF*"
+        },
+        {
+            "macaddress": "C04E30*"
+        },
+        {
+            "macaddress": "C05D89*"
+        },
+        {
+            "macaddress": "C0CDD6*"
+        },
+        {
+            "macaddress": "C44F33*"
+        },
+        {
+            "macaddress": "C45BBE*"
+        },
+        {
+            "macaddress": "C4D8D5*"
+        },
+        {
+            "macaddress": "C4DD57*"
+        },
+        {
+            "macaddress": "C4DEE2*"
+        },
+        {
+            "macaddress": "C82B96*"
+        },
+        {
+            "macaddress": "C82E18*"
+        },
+        {
+            "macaddress": "C8C9A3*"
+        },
+        {
+            "macaddress": "C8F09E*"
+        },
+        {
+            "macaddress": "CC50E3*"
+        },
+        {
+            "macaddress": "CC7B5C*"
+        },
+        {
+            "macaddress": "CC8DA2*"
+        },
+        {
+            "macaddress": "CCBA97*"
+        },
+        {
+            "macaddress": "CCDBA7*"
+        },
+        {
+            "macaddress": "D0CF13*"
+        },
+        {
+            "macaddress": "D0EF76*"
+        },
+        {
+            "macaddress": "D48AFC*"
+        },
+        {
+            "macaddress": "D48C49*"
+        },
+        {
+            "macaddress": "D4D4DA*"
+        },
+        {
+            "macaddress": "D4E9F4*"
+        },
+        {
+            "macaddress": "D4F98D*"
+        },
+        {
+            "macaddress": "D8132A*"
+        },
+        {
+            "macaddress": "D83BDA*"
+        },
+        {
+            "macaddress": "D885AC*"
+        },
+        {
+            "macaddress": "D8A01D*"
+        },
+        {
+            "macaddress": "D8BC38*"
+        },
+        {
+            "macaddress": "D8BFC0*"
+        },
+        {
+            "macaddress": "D8F15B*"
+        },
+        {
+            "macaddress": "DC0675*"
+        },
+        {
+            "macaddress": "DC1ED5*"
+        },
+        {
+            "macaddress": "DC4F22*"
+        },
+        {
+            "macaddress": "DC5475*"
+        },
+        {
+            "macaddress": "DCB4D9*"
+        },
+        {
+            "macaddress": "DCDA0C*"
+        },
+        {
+            "macaddress": "E05A1B*"
+        },
+        {
+            "macaddress": "E072A1*"
+        },
+        {
+            "macaddress": "E08CFE*"
+        },
+        {
+            "macaddress": "E09806*"
+        },
+        {
+            "macaddress": "E0E2E6*"
+        },
+        {
+            "macaddress": "E465B8*"
+        },
+        {
+            "macaddress": "E4B063*"
+        },
+        {
+            "macaddress": "E4B323*"
+        },
+        {
+            "macaddress": "E80690*"
+        },
+        {
+            "macaddress": "E831CD*"
+        },
+        {
+            "macaddress": "E83DC1*"
+        },
+        {
+            "macaddress": "E868E7*"
+        },
+        {
+            "macaddress": "E86BEA*"
+        },
+        {
+            "macaddress": "E89F6D*"
+        },
+        {
+            "macaddress": "E8DB84*"
+        },
+        {
+            "macaddress": "E8F60A*"
+        },
+        {
+            "macaddress": "EC6260*"
+        },
+        {
+            "macaddress": "EC64C9*"
+        },
+        {
+            "macaddress": "EC94CB*"
+        },
+        {
+            "macaddress": "ECC9FF*"
+        },
+        {
+            "macaddress": "ECDA3B*"
+        },
+        {
+            "macaddress": "ECE334*"
+        },
+        {
+            "macaddress": "ECFABC*"
+        },
+        {
+            "macaddress": "F008D1*"
+        },
+        {
+            "macaddress": "F0161D*"
+        },
+        {
+            "macaddress": "F024F9*"
+        },
+        {
+            "macaddress": "F09E9E*"
+        },
+        {
+            "macaddress": "F0F5BD*"
+        },
+        {
+            "macaddress": "F412FA*"
+        },
+        {
+            "macaddress": "F42DC9*"
+        },
+        {
+            "macaddress": "F4650B*"
+        },
+        {
+            "macaddress": "F4CFA2*"
+        },
+        {
+            "macaddress": "F85B1B*"
+        },
+        {
+            "macaddress": "F8B3B7*"
+        },
+        {
+            "macaddress": "FC012C*"
+        },
+        {
+            "macaddress": "FCB467*"
+        },
+        {
+            "macaddress": "FCE8C0*"
+        },
+        {
+            "macaddress": "FCF5C4*"
+        }
+    ],
     "documentation": "https://github.com/acvigue/homeassistant-pixelair",
     "integration_type": "device",
     "iot_class": "local_push",
     "quality_scale": "bronze",
-    "requirements": ["libpixelair==1.0.0"],
-    "version": "1.0.0"
+    "requirements": [
+        "libpixelair==1.0.0"
+    ],
+    "version": "1.1.0"
 }

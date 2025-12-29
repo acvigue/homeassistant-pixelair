@@ -2,17 +2,19 @@
 
 This module handles the configuration flow for adding PixelAir devices
 to Home Assistant. It supports automatic device discovery on the
-local network via UDP broadcast.
+local network via UDP broadcast, as well as DHCP-triggered discovery.
 """
 
 from __future__ import annotations
 
+import asyncio
 import logging
 from typing import Any
 
 from libpixelair import DiscoveredDevice, DiscoveryService, UDPListener
 import voluptuous as vol
 
+from homeassistant.components.dhcp import DhcpServiceInfo
 from homeassistant.config_entries import ConfigFlow, ConfigFlowResult
 from homeassistant.const import CONF_NAME
 
@@ -40,6 +42,92 @@ class PixelAirConfigFlow(ConfigFlow, domain=DOMAIN):
         self._discovered_device: DiscoveredDevice | None = None
         self._discovered_devices: dict[str, DiscoveredDevice] = {}
         self._listener: UDPListener | None = None
+        self._dhcp_discovery_info: DhcpServiceInfo | None = None
+
+    async def async_step_dhcp(
+        self, discovery_info: DhcpServiceInfo
+    ) -> ConfigFlowResult:
+        """Handle DHCP discovery of an ESP32 device.
+
+        When DHCP detects an ESP32 device on the network, this step
+        probes it via UDP to check if it's a PixelAir device.
+
+        Args:
+            discovery_info: DHCP discovery information containing IP and MAC.
+
+        Returns:
+            The next step in the flow or abort if not a PixelAir device.
+        """
+        _LOGGER.debug(
+            "DHCP discovery triggered for %s (%s)",
+            discovery_info.ip,
+            discovery_info.macaddress,
+        )
+
+        # Normalize MAC address for unique_id
+        mac_address = discovery_info.macaddress.lower().replace(":", "")
+
+        # Check if this device is already configured
+        await self.async_set_unique_id(mac_address)
+        self._abort_if_unique_id_configured(updates={"ip": discovery_info.ip})
+
+        # Store DHCP info for later use
+        self._dhcp_discovery_info = discovery_info
+
+        # Probe the device via UDP to confirm it's a PixelAir device
+        try:
+            listener = await self._get_listener()
+            discovery = DiscoveryService(listener)
+
+            # Send targeted discovery to the specific IP
+            device = await discovery.verify_device(
+                ip_address=discovery_info.ip,
+                timeout=5.0,
+            )
+
+            if device is None:
+                # Device didn't respond to PixelAir protocol
+                _LOGGER.debug(
+                    "Device at %s is not a PixelAir device", discovery_info.ip
+                )
+                await self._cleanup_listener()
+                return self.async_abort(reason="not_pixelair_device")
+
+            # Get full device info (model, MAC, etc.)
+            device = await discovery.get_device_info(device, timeout=5.0)
+            await self._cleanup_listener()
+
+            # Verify MAC address matches
+            if device.mac_address:
+                device_mac = device.mac_address.lower().replace(":", "")
+                if device_mac != mac_address:
+                    _LOGGER.debug(
+                        "MAC mismatch: expected %s, got %s",
+                        mac_address,
+                        device_mac,
+                    )
+                    return self.async_abort(reason="not_pixelair_device")
+
+            self._discovered_device = device
+            _LOGGER.info(
+                "DHCP discovery confirmed PixelAir device: %s at %s",
+                device.display_name,
+                discovery_info.ip,
+            )
+            return await self.async_step_confirm()
+
+        except asyncio.TimeoutError:
+            _LOGGER.debug(
+                "Timeout probing device at %s", discovery_info.ip
+            )
+            await self._cleanup_listener()
+            return self.async_abort(reason="not_pixelair_device")
+        except Exception as err:
+            _LOGGER.debug(
+                "Error probing device at %s: %s", discovery_info.ip, err
+            )
+            await self._cleanup_listener()
+            return self.async_abort(reason="not_pixelair_device")
 
     async def _get_listener(self) -> UDPListener:
         """Get or create a UDP listener for discovery.
@@ -114,10 +202,12 @@ class PixelAirConfigFlow(ConfigFlow, domain=DOMAIN):
             new_devices: list[DiscoveredDevice] = []
             for device in devices:
                 if device.mac_address:
-                    await self.async_set_unique_id(device.mac_address.lower())
+                    # Normalize MAC address (lowercase, no colons)
+                    normalized_mac = device.mac_address.lower().replace(":", "")
+                    await self.async_set_unique_id(normalized_mac)
                     existing = self._async_current_entries()
                     is_configured = any(
-                        entry.unique_id == device.mac_address.lower()
+                        entry.unique_id == normalized_mac
                         for entry in existing
                     )
                     if not is_configured:
@@ -129,9 +219,10 @@ class PixelAirConfigFlow(ConfigFlow, domain=DOMAIN):
             # If only one device, go directly to confirmation
             if len(new_devices) == 1:
                 self._discovered_device = new_devices[0]
-                await self.async_set_unique_id(
-                    self._discovered_device.mac_address.lower()
+                normalized_mac = self._discovered_device.mac_address.lower().replace(
+                    ":", ""
                 )
+                await self.async_set_unique_id(normalized_mac)
                 self._abort_if_unique_id_configured()
                 return await self.async_step_confirm()
 
@@ -169,9 +260,10 @@ class PixelAirConfigFlow(ConfigFlow, domain=DOMAIN):
             if self._discovered_device is None:
                 return self.async_abort(reason="device_not_found")
 
-            await self.async_set_unique_id(
-                self._discovered_device.mac_address.lower()
+            normalized_mac = self._discovered_device.mac_address.lower().replace(
+                ":", ""
             )
+            await self.async_set_unique_id(normalized_mac)
             self._abort_if_unique_id_configured()
             return await self.async_step_confirm()
 
@@ -207,11 +299,15 @@ class PixelAirConfigFlow(ConfigFlow, domain=DOMAIN):
             return self.async_abort(reason="device_not_found")
 
         if user_input is not None:
+            # Normalize MAC address (lowercase, no colons)
+            normalized_mac = self._discovered_device.mac_address.lower().replace(
+                ":", ""
+            )
             return self.async_create_entry(
                 title=self._discovered_device.display_name,
                 data={
                     CONF_NAME: self._discovered_device.display_name,
-                    CONF_MAC_ADDRESS: self._discovered_device.mac_address.lower(),
+                    CONF_MAC_ADDRESS: normalized_mac,
                     CONF_SERIAL_NUMBER: self._discovered_device.serial_number,
                 },
             )

@@ -25,7 +25,8 @@
             "already_configured": "This device is already configured.",
             "no_devices_found": "No PixelAir devices were found on the network. Please ensure your device is powered on and connected to the same network.",
             "all_devices_configured": "All discovered PixelAir devices are already configured.",
-            "device_not_found": "The selected device could not be found."
+            "device_not_found": "The selected device could not be found.",
+            "not_pixelair_device": "The discovered device is not a PixelAir device."
         }
     }
 }
